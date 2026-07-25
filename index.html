@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hall of Fame - Meta Whale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div class="header">
+      <!-- Left -->
+      <div class="header-brand-col">
+          <div class="header-brand">
+              <img class="logo-mark" src="Logo/mw.png" alt="Meta Whale logo" />
+              <div>
+                  <div class="header-title">Meta Whale</div>
+                  <div class="header-sub" id="headerSub">loading…</div>
+              </div>
+          </div>
+      </div>
+      <!-- Center -->
+      <div class="site-title-wrap">
+          <div class="super-title">International Digital Account Achievers</div>
+          <div class="site-title">Hall of Fame</div>
+      </div>
+      <!-- Right -->
+      <div class="header-right">
+          <img class="royal-logo" src="Logo/rwt.png" alt="Royal Winners Team logo" />
+      </div>
+  </div>
+
+  <div class="board-header">
+      <div class="board-label" id="boardLabel">
+          Members in V-BOOST
+      </div>
+
+      <div class="board-tabs" id="boardTabs">
+          <button class="board-tab active" data-board="vboost">V-BOOST</button>
+          <button class="board-tab" data-board="ts">T&S</button>
+      </div>  
+  </div>
+  
+  <div class="level-list" id="levelList"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 class="modal-title" id="modalTitle">Request to add a member in Level X</h2>
+    <p class="modal-sub">Submit their details below. An admin will review before it appears on the board.</p>
+
+    <div class="step-dots" id="stepDots"></div>
+
+    <form id="requestForm">
+
+      <!-- Step 0: Hall of Fame photo — pick, then position it in one step -->
+      <div class="wizard-step" data-step="0">
+        <div class="step-label">Step 1 of 6</div>
+        <h3 class="step-heading">Hall of Fame photo</h3>
+
+        <div id="photoPickView">
+          <p class="step-hint">Choose a clear photo under 500 KB — you'll get to reposition it next.</p>
+          <div class="big-drop" id="bigDrop">
+            <div class="big-drop-icon">📷</div>
+            <div class="file-drop-label">Tap to choose a photo</div>
+            <input type="file" accept="image/*" id="hofPhotoInput" />
+          </div>
+        </div>
+
+        <div id="photoCropView" style="display:none;">
+          <p class="step-hint">Drag to move, use the slider to zoom, then tap OK.</p>
+          <div class="crop-stage">
+            <div class="crop-frame" id="cropFrame">
+              <canvas id="cropCanvas" width="260" height="260"></canvas>
+            </div>
+            <div class="crop-controls">
+              <label for="zoomRange">Zoom</label>
+              <input type="range" id="zoomRange" min="100" max="300" value="100" />
+            </div>
+            <button type="button" class="redo-link" id="choosePhotoAgainBtn">Choose a different photo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: full name -->
+      <div class="wizard-step" data-step="1">
+        <div class="step-label">Step 2 of 6</div>
+        <h3 class="step-heading">Full name</h3>
+        <img class="step-photo-preview" id="namePhotoPreview" />
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="nameInput" placeholder="e.g. Michael Raj" />
+        </div>
+      </div>
+
+      <!-- Step 2: District -->
+      <div class="wizard-step" data-step="2">
+        <div class="step-label">Step 3 of 6</div>
+        <h3 class="step-heading">District</h3>
+        <div class="field">
+          <label>District</label>
+          <input type="text" id="districtInput" placeholder="e.g. Kanyakumari" />
+        </div>
+      </div>
+
+      <!-- Step 3: WhatsApp number -->
+      <div class="wizard-step" data-step="3">
+        <div class="step-label">Step 4 of 6</div>
+        <h3 class="step-heading">WhatsApp number</h3>
+        <p class="step-hint">Pick the country code — the number length is checked automatically.</p>
+        <div class="field">
+          <label>WhatsApp number</label>
+          <div class="phone-row">
+            <select id="countryCodeInput"></select>
+            <input type="tel" id="phoneInput" placeholder="10 digit number" inputmode="numeric" />
+          </div>
+          <div class="field-hint" id="phoneHint"></div>
+        </div>
+      </div>
+
+      <!-- Step 4: board-specific identifier -->
+      <div class="wizard-step" data-step="4">
+        <div class="step-label">Step 5 of 6</div>
+        <h3 class="step-heading" id="identifierHeading">Passport NFT</h3>
+        <p class="step-hint" id="identifierHint">Enter the 5-digit Passport NFT number.</p>
+        <div class="field">
+          <label id="identifierLabel">Passport NFT number</label>
+          <input type="text" id="nftInput" placeholder="e.g. 04821" inputmode="numeric" maxlength="5" />
+        </div>
+        <div class="upgrade-notice" id="upgradeNotice">
+          <p class="upgrade-notice-text" id="upgradeNoticeText"></p>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="upgradeCancelBtn">Cancel</button>
+            <button type="button" class="btn btn-primary" id="upgradeConfirmBtn">Yes, upgrade</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: photo proof -->
+      <div class="wizard-step" data-step="5">
+        <div class="step-label">Step 6 of 6</div>
+        <h3 class="step-heading">Proof photo</h3>
+        <p class="step-hint" id="proofPhotoHint">Upload a clear photo that verifies your Passport NFT.</p>
+        <div class="field">
+          <div class="file-drop" id="proofPhotoDrop">
+            <img id="proofPhotoPreview" alt="Proof photo preview" />
+            <div class="file-drop-label" id="proofPhotoLabel">Tap to choose a photo</div>
+            <input type="file" accept="image/*" id="proofPhotoInput" />
+          </div>
+        </div>
+      </div>
+
+      <p class="form-error" id="formError"></p>
+
+      <div class="wizard-nav" id="wizardNav">
+        <button type="button" class="btn btn-secondary" id="backBtn">Back</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">Submit</button>
+      </div>
+    </form>
+
+    <div class="success-view" id="formSuccess">
+      <div class="success-icon">✅</div>
+      <p class="success-text">Request submitted successfully!<br>Action will be taken on your request within 24 hours.<br>If further information is required, our admin team will contact you.</p>
+      <button type="button" class="btn btn-primary" id="successOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
