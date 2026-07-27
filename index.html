@@ -612,6 +612,10 @@
     // and only for 5+ photos. With 1-4 photos it still auto-spins, but scrolling over
     // it does nothing special, so the page keeps scrolling normally either direction.
     let onWheel = null
+    // Touch swipe — same idea as the wheel handler above, but for mobile where there's
+    // no hover/wheel. A horizontal drag moves the track directly; the marquee just
+    // keeps drifting from wherever the finger leaves it.
+    let onTouchStart = null, onTouchMove = null, onTouchEnd = null
     if (count >= VISIBLE_SLOTS) {
       onWheel = (e) => {
         if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return // vertical — let the page scroll
@@ -624,6 +628,39 @@
         }
       }
       carousel.addEventListener('wheel', onWheel, { passive: false })
+
+      let touchStartX = 0, touchStartY = 0, touchStartOffset = 0, dragging = false, isHorizontal = null
+      onTouchStart = (e) => {
+        const t = e.touches[0]
+        touchStartX = t.clientX
+        touchStartY = t.clientY
+        touchStartOffset = offset
+        dragging = true
+        isHorizontal = null
+        paused = true
+      }
+      onTouchMove = (e) => {
+        if (!dragging) return
+        const t = e.touches[0]
+        const dx = touchStartX - t.clientX
+        const dy = touchStartY - t.clientY
+        if (isHorizontal === null) isHorizontal = Math.abs(dx) > Math.abs(dy)
+        if (!isHorizontal) return // vertical swipe — let the page scroll normally
+        e.preventDefault()
+        const half = halfWidth()
+        if (half > 0) {
+          offset = ((touchStartOffset + dx) % half + half) % half
+          track.style.transform = `translateX(${-offset}px)`
+        }
+      }
+      onTouchEnd = () => {
+        dragging = false
+        paused = false // hand it back to the drift once released
+      }
+      carousel.addEventListener('touchstart', onTouchStart, { passive: true })
+      carousel.addEventListener('touchmove', onTouchMove, { passive: false })
+      carousel.addEventListener('touchend', onTouchEnd, { passive: true })
+      carousel.addEventListener('touchcancel', onTouchEnd, { passive: true })
     }
 
     rafId = requestAnimationFrame(step)
@@ -633,6 +670,12 @@
       carousel.removeEventListener('mouseenter', onEnter)
       carousel.removeEventListener('mouseleave', onLeave)
       if (onWheel) carousel.removeEventListener('wheel', onWheel)
+      if (onTouchStart) carousel.removeEventListener('touchstart', onTouchStart)
+      if (onTouchMove) carousel.removeEventListener('touchmove', onTouchMove)
+      if (onTouchEnd) {
+        carousel.removeEventListener('touchend', onTouchEnd)
+        carousel.removeEventListener('touchcancel', onTouchEnd)
+      }
     }
   }
 
