@@ -7,9 +7,269 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css">
+<style>
+  :root {
+    --bg: #0a0e17; --panel: #161a23; --panel-hover: #1c2130; --line: #262c3a;
+    --gold: #e8b65a; --gold-dim: #7a6636; --text: #edeff4; --muted: #8a90a3;
+    --danger: #e0685f; --success: #62b583;
+    --whale-blue: #4fc3e0; --whale-blue-light: #cdf1ff; --whale-navy: #0c1c33;
+    --font-display: 'Archivo Black', 'Inter', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'Roboto Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 900px 520px at 18% -8%, rgba(79, 195, 224, 0.16), transparent 60%),
+      radial-gradient(ellipse 700px 480px at 100% 0%, rgba(232, 182, 90, 0.10), transparent 55%),
+      radial-gradient(ellipse 1000px 600px at 50% 110%, rgba(79, 195, 224, 0.08), transparent 60%),
+      linear-gradient(180deg, #0d1526 0%, #070a12 100%);
+    background-attachment: fixed;
+    color: var(--text); font-family: var(--font-body); -webkit-font-smoothing: antialiased;
+  }
+
+  /* Full-bleed app shell — fills the viewport instead of sitting in a narrow column */
+  .app { width: 100%; max-width: 1440px; margin: 0 auto; padding: 32px clamp(20px, 4vw, 56px) 80px; }
+
+  .header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; margin-bottom: 28px; }
+  .header-brand-col { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; grid-column: 1; justify-self: start; }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-right{ grid-column: 3; justify-self: end; align-self: start; }
+  .royal-logo {
+    height: 150px; width: auto; flex-shrink: 0; display: block;
+    object-fit: contain; background: transparent;
+    filter: drop-shadow(0 4px 10px rgba(232, 182, 90, 0.35));
+  }
+  .logo-mark {
+    width: 60px; height: auto; flex-shrink: 0; display: block;
+    object-fit: contain; background: transparent;
+    filter: drop-shadow(0 4px 10px rgba(79, 195, 224, 0.35));
+  }
+  .header-title {
+    font-family: var(--font-display); font-size: 17px; letter-spacing: 0.8px; text-transform: uppercase;
+    background: linear-gradient(100deg, var(--whale-blue-light) 0%, var(--whale-blue) 45%, #eaf9ff 70%, var(--whale-blue) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .site-title-wrap {
+    grid-column: 2; justify-self: center; text-align: center;
+  }
+  .super-title {
+    font-family: var(--font-display); font-size: clamp(16px, 2vw, 24px); letter-spacing: 2px;
+    text-transform: uppercase; white-space: nowrap; margin-bottom: 4px; transform: translateY(-25px);
+    color: var(--whale-blue-light);
+    text-shadow: 0 0 16px rgba(79, 195, 224, 0.35);
+  }
+  .site-title {
+    font-family: var(--font-display); font-size: clamp(22px, 4vw, 34px); letter-spacing: 3px;
+    text-transform: uppercase; white-space: nowrap;
+    background: linear-gradient(100deg, var(--gold) 0%, #fff3d6 25%, var(--gold) 50%, #fff3d6 75%, var(--gold) 100%);
+    background-size: 250% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 26px rgba(232, 182, 90, 0.35);
+    animation: shimmer 7s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: -250% 50%; }
+  }
+  @media (max-width: 720px) {
+    /* Mobile-only header re-layout: row1 = super-title, row2 = both logos
+       side by side, row3 = "Hall of Fame" title. Desktop layout (the 3-column
+       grid above) is untouched — this block only applies under 720px. */
+    .header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        "supertitle supertitle"
+        "logo1 logo2"
+        "title title";
+      justify-items: center; text-align: center; gap: 10px 6px;
+    }
+    .header-brand-col, .site-title-wrap { display: contents; }
+    .super-title { grid-area: supertitle; transform: none; margin-bottom: 0; }
+    .header-brand { grid-area: logo1; justify-self: end; }
+    .header-right { grid-area: logo2; justify-self: start; align-self: center; }
+    .site-title { grid-area: title; }
+    .site-title, .super-title { white-space: normal; }
+    .royal-logo { height: 60px; }
+    .logo-mark { width: 40px; }
+    .header-title { font-size: 14px; }
+    .header-sub { font-size: 10px; }
+  }
+
+  @media (max-width: 720px) {
+    /* Board row: all 4 tab options first, "Members in X" sentence below them */
+    .board-header { flex-direction: column; align-items: stretch; gap: 12px; }
+    .board-tabs { order: 1; flex-wrap: wrap; }
+    .board-tab { flex: 1 1 45%; padding: 10px 8px; text-align: center; }
+    .board-label { order: 2; text-align: center; font-size: 18px; }
+
+    /* Level rows: free up room so 3 photos fit comfortably in the middle */
+    .level-row { gap: 10px; padding: 14px 2px; }
+    .level-tag { width: 58px; font-size: 14px; }
+    .add-btn { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; }
+    .photo-name { font-size: 12px; }
+    .photo-district { font-size: 10px; }
+  }
+  .header-sub { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ---- Board tabs: switch between the two lists on this one page ---- */
+  .board-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+
+  .board-label{
+    font-family: var(--font-display);
+    font-size: 25px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .board-tabs { display: flex; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; margin-left: 0; margin-bottom: 0; }
+  .board-tab { border: none; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 700; font-size: 13px; padding: 10px 22px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+  .board-tab.active { background: var(--gold); color: #14161c; }
+
+  .level-list { display: flex; flex-direction: column; }
+  .level-row { display: flex; align-items: center; gap: 20px; padding: 20px 4px; border-bottom: 1px solid var(--line); }
+  .level-row:last-child { border-bottom: none; }
+  .level-tag { font-family: var(--font-display); font-size: 20px; color: var(--gold); width: 120px; flex-shrink: 0; line-height: 1; }
+
+  /* ---- Photo row: 1-4 photos are static, evenly spread & centered; 5+ spin in a loop ---- */
+  .carousel-wrap { flex: 1; min-width: 0; overflow: hidden; }
+  .photo-carousel {
+    overflow: hidden; /* viewport — the track inside it is what moves/sizes */
+    padding: 10px 6px 14px;
+    --card-size: 68px; /* recalculated in JS: usable-width / 5, fixed regardless of count */
+  }
+  .photo-track {
+    display: flex; align-items: flex-start; gap: 14px;
+    width: max-content;
+  }
+  .photo-track--static { justify-content: space-evenly; width: 100%; }
+  .photo-track--marquee { will-change: transform; }
+  .photo-card {
+    flex: 0 0 auto; width: var(--card-size);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .photo-square {
+    width: var(--card-size); height: var(--card-size); border-radius: 10px; object-fit: cover;
+    background: var(--line); border: 1px solid var(--line);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    display: block;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  .photo-name {
+    font-size: 14px; font-weight: 700; color: var(--text); text-align: center;
+    max-width: calc(var(--card-size) + 22px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .photo-district {
+    font-size: 11px; font-weight: 500; color: var(--muted); text-align: center;
+    max-width: calc(var(--card-size) + 22px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: -2px;
+  }
+
+  /* ---- 3D-styled add button ---- */
+  .add-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: none; flex-shrink: 0;
+    background: linear-gradient(180deg, #f4cd85 0%, var(--gold) 55%, #b9862f 100%);
+    color: #14161c; font-size: 22px; font-weight: 800; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 0 #8a6323, 0 8px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
+    transform: translateY(0);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+  }
+  .add-btn:hover:not(:disabled) { filter: brightness(1.06); }
+  .add-btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #8a6323, 0 3px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .add-btn:disabled {
+    opacity: 0.4; cursor: not-allowed;
+    box-shadow: 0 4px 0 #4b4636, 0 6px 10px rgba(0,0,0,0.3);
+    background: linear-gradient(180deg, #6b6455, #4b4636);
+    color: var(--muted);
+  }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(8,9,13,0.7); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 420px; max-height: 88vh; overflow-y: auto; padding: 24px; }
+  .modal-title { font-family: var(--font-display); font-size: 16px; margin: 0 0 4px; line-height: 1.3; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin: 0 0 20px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input[type="text"], .field input[type="tel"] { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px; font-family: var(--font-body); }
+  .field input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
+  .file-drop { border: 1px dashed var(--line); border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; background: var(--bg); position: relative; overflow: hidden; }
+  .file-drop img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; display: none; }
+  .file-drop-label { font-size: 12px; color: var(--muted); }
+  .file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .btn { flex: 1; border: none; border-radius: 8px; padding: 11px 16px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
+  .btn-primary { background: var(--gold); color: #14161c; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: transparent; border: 1px solid var(--line); color: var(--text); }
+  .form-error { font-size: 13px; font-weight: 600; color: var(--danger); background: rgba(224,104,95,0.12); border: 1px solid rgba(224,104,95,0.4); border-radius: 8px; padding: 10px 12px; margin: 0 0 14px; display: none; }
+  .upgrade-notice { display: none; margin-top: 14px; background: rgba(232,182,90,0.10); border: 1px solid rgba(232,182,90,0.4); border-radius: 8px; padding: 12px 14px; }
+  .upgrade-notice.open { display: block; }
+  .upgrade-notice-text { font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 12px; line-height: 1.4; }
+  .upgrade-notice .modal-actions { margin-top: 0; }
+  .success-view { display: none; text-align: center; padding: 10px 0 0; }
+  .success-icon { font-size: 40px; line-height: 1; margin-bottom: 12px; }
+  .success-text { font-size: 14px; color: var(--text); line-height: 1.5; margin: 0 0 22px; }
+  .success-view .btn { max-width: 220px; margin: 0 auto; }
+
+  /* ---- Wizard progress dots ---- */
+  .step-dots { display: flex; gap: 6px; margin-bottom: 18px; }
+  .step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--line); transition: background 0.2s ease; }
+  .step-dot.done { background: var(--gold-dim); }
+  .step-dot.active { background: var(--gold); }
+
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; }
+  .step-label { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; font-family: var(--font-mono); }
+  .step-heading { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  .step-hint { font-size: 12px; color: var(--muted); margin: 0 0 16px; }
+
+  /* ---- Big photo picker (step 0) ---- */
+  .big-drop { border: 1px dashed var(--line); border-radius: 12px; padding: 28px 14px; text-align: center; cursor: pointer; background: var(--bg); position: relative; }
+  .big-drop-icon { font-size: 28px; margin-bottom: 8px; }
+  .big-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  /* ---- Crop tool (step 0, shown after a photo is picked) ---- */
+  .crop-stage { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .crop-frame {
+    width: 260px; height: 260px; border-radius: 14px; overflow: hidden;
+    background: #000; border: 2px solid var(--gold-dim);
+    touch-action: none; cursor: grab; position: relative;
+  }
+  .crop-frame:active { cursor: grabbing; }
+  .crop-frame canvas { display: block; }
+  .crop-controls { width: 100%; display: flex; align-items: center; gap: 10px; }
+  .crop-controls label { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .crop-controls input[type="range"] { flex: 1; accent-color: var(--gold); }
+  .crop-tip { font-size: 11px; color: var(--muted); text-align: center; }
+
+  /* ---- Preview thumb after crop/upload ---- */
+  .step-photo-preview { width: 96px; height: 96px; border-radius: 10px; object-fit: cover; display: block; margin: 0 auto 14px; border: 2px solid var(--gold-dim); }
+  .redo-link { display: block; text-align: center; font-size: 12px; color: var(--gold); cursor: pointer; margin: 4px 0 0; background: none; border: none; font-family: var(--font-body); text-decoration: underline; padding: 0; }
+
+  /* ---- Phone / country code row (step 2) ---- */
+  .phone-row { display: flex; gap: 8px; }
+  .phone-row select { flex: 0 0 118px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 6px; color: var(--text); font-size: 13px; font-family: var(--font-body); }
+  .phone-row input { flex: 1; min-width: 0; }
+  .field-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .wizard-nav { display: flex; gap: 10px; margin-top: 22px; }
+</style>
 </head>
 <body>
+
 <div class="app">
   <div class="header">
       <!-- Left -->
@@ -39,8 +299,10 @@
       </div>
 
       <div class="board-tabs" id="boardTabs">
-          <button class="board-tab active" data-board="vboost">V-BOOST</button>
-          <button class="board-tab" data-board="ts">T&S</button>
+          <button class="board-tab active" data-board="vboost">V-Boost Level</button>
+          <button class="board-tab" data-board="ts">T&S Level</button>
+          <button class="board-tab" data-board="vboost_direct">V-Boost Direct</button>
+          <button class="board-tab" data-board="ts_direct">T&S Direct</button>
       </div>  
   </div>
   
@@ -171,6 +433,867 @@
   </div>
 </div>
 
-<script type="module" src="script.js"></script>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+  const SUPABASE_URL = 'https://ghyaoezeeecfxizegqov.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoeWFvZXplZWVjZnhpemVncW92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MDA3OTMsImV4cCI6MjEwMDM3Njc5M30.5tFudWfakxruQ6sVbHiIHuuQue7kxkciEykbPEZVuKI'
+  const PHOTO_BUCKET = 'member-photos'
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  const BOARD_LABELS = { vboost: 'V-Boost Level', ts: 'T&S Level', vboost_direct: 'V-Boost Direct', ts_direct: 'T&S Direct' }
+  const BOARD_LEVEL_COUNTS = { vboost: 10, ts: 12, vboost_direct: 30, ts_direct: 30 }
+  function levelsFor(board) {
+    const n = BOARD_LEVEL_COUNTS[board]
+    return Array.from({ length: n }, (_, i) => n - i) // highest down to 1
+  }
+  // "Direct" boards use the same identifier format as their parent board
+  // (vboost_direct -> 5-digit Passport NFT, ts_direct -> 10-char Link ID),
+  // just with 30 levels instead of 10/12, and their own level-tag wording.
+  function isDirectBoard(board) { return board === 'vboost_direct' || board === 'ts_direct' }
+  function isTsBoard(board) { return board === 'ts' || board === 'ts_direct' }
+  function levelTagLabel(board, level) {
+    return isDirectBoard(board) ? `${level} Direct` : `Level ${level}`
+  }
+  const MOBILE_BREAKPOINT = '(max-width: 720px)'
+  // Photos are sized so exactly this many fill the row, centered between the level
+  // and the + button. Desktop keeps 5; on mobile it drops to 3 (both the "static vs
+  // spinning" threshold and the photo sizing follow this same number).
+  function VISIBLE_SLOTS() {
+    return window.matchMedia(MOBILE_BREAKPOINT).matches ? 3 : 5
+  }
+  const CARD_GAP = 14 // px between photos — must match the .photo-carousel CSS gap
+
+  let currentBoard = 'vboost'
+  let allMembers = []         // every member row, both boards — filtered per board at render time
+  let membersByLevel = {}     // { level: [member, ...] } newest first, for the currently shown board
+  let activeBoard = null      // board the add-member modal is currently open for
+  let activeLevel = null
+
+  const levelListEl = document.getElementById('levelList')
+  const headerSub = document.getElementById('headerSub')
+  const boardTabs = document.getElementById('boardTabs')
+
+  boardTabs.querySelectorAll('.board-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      if (tab.dataset.board === currentBoard) return
+      currentBoard = tab.dataset.board
+      render()
+    })
+  })
+
+  let lastMembersSignature = null
+  function membersSignature(rows) {
+    return rows.map((r) => `${r.id}:${r.board}:${r.level}:${r.name}:${r.district}:${r.photo_url}`).sort().join('|')
+  }
+
+  async function loadMembers() {
+    const { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Failed to load members:', error)
+      allMembers = []
+      render()
+      headerSub.textContent = `Couldn't load members — ${error.message || 'check your Supabase setup'}`
+      return
+    }
+
+    // Skip the re-render (and the image reload/flicker that comes with it) when the
+    // periodic poll or a realtime event fires but nothing has actually changed.
+    const sig = membersSignature(data)
+    if (sig === lastMembersSignature) return
+    lastMembersSignature = sig
+
+    allMembers = data
+    render()
+  }
+
+  const boardLabel = document.getElementById("boardLabel");
+
+  function render() {
+    boardTabs.querySelectorAll('.board-tab').forEach((tab) => {
+      tab.classList.toggle('active', tab.dataset.board === currentBoard)
+    })
+    boardLabel.textContent = `Members in ${BOARD_LABELS[currentBoard] || currentBoard}`
+
+    const LEVELS = levelsFor(currentBoard)
+    membersByLevel = {}
+    for (const row of allMembers) {
+      if (row.board !== currentBoard) continue
+      if (!membersByLevel[row.level]) membersByLevel[row.level] = []
+      membersByLevel[row.level].push(row)
+    }
+    headerSub.textContent = `${BOARD_LABELS[currentBoard]} — ${LEVELS.length} levels`
+
+    levelListEl.innerHTML = ''
+    for (const level of LEVELS) {
+      const levelMembers = membersByLevel[level] || [] // newest first — newest sits leftmost
+      const count = levelMembers.length
+
+      const slots = VISIBLE_SLOTS()
+      let carouselInner = ''
+      if (count > 0 && count < slots) {
+        // fewer than `slots` photos: static, no spinning — just share the row equally and stay centered
+        carouselInner = `<div class="photo-track photo-track--static">${levelMembers.map(renderPhotoCard).join('')}</div>`
+      } else if (count >= slots) {
+        // `slots` or more photos: duplicate the set once so the strip can loop seamlessly forever
+        const doubled = [...levelMembers, ...levelMembers]
+        carouselInner = `<div class="photo-track photo-track--marquee">${doubled.map(renderPhotoCard).join('')}</div>`
+      }
+      // count === 0 -> carouselInner stays empty, nothing is rendered in the row
+
+      const row = document.createElement('div')
+      row.className = 'level-row'
+
+      row.innerHTML = `
+        <div class="level-tag">${levelTagLabel(currentBoard, level)}</div>
+        <div class="carousel-wrap">
+          <div class="photo-carousel" data-level="${level}" data-count="${count}">
+            ${carouselInner}
+          </div>
+        </div>
+        <button class="add-btn" data-level="${level}" aria-label="Add member to level ${level}">+</button>
+      `
+
+      levelListEl.appendChild(row)
+    }
+
+    // wire up + buttons
+    levelListEl.querySelectorAll('.add-btn').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(currentBoard, btn.dataset.level))
+    })
+
+    // wire up carousels: size the photos (fixed size) and start the seamless
+    // auto-scrolling loop for any level with 5+ photos (1-4 stay static)
+    levelListEl.querySelectorAll('.photo-carousel').forEach((carousel) => {
+      setupCarousel(carousel)
+    })
+  }
+
+  function renderPhotoCard(m) {
+    return `
+      <div class="photo-card">
+        <img class="photo-square" src="${escapeHtml(m.photo_url)}" alt="${escapeHtml(m.name)}" />
+        <div class="photo-name">${escapeHtml(m.name)}</div>
+        ${m.district ? `<div class="photo-district">${escapeHtml(m.district)}</div>` : ''}
+      </div>
+    `
+  }
+
+  // ---- Size photo cards so they fill the row: always sized for VISIBLE_SLOTS(),
+  // so photos stay the same size whether the level has 1 photo or many ----
+  function sizeCarousel(carousel) {
+    const wrap = carousel.parentElement
+    const sidePadding = 12 // matches the carousel's left+right padding
+    const slots = VISIBLE_SLOTS()
+    const usable = wrap.clientWidth - sidePadding - CARD_GAP * (slots - 1)
+    const size = Math.max(40, Math.floor(usable / slots))
+    carousel.style.setProperty('--card-size', size + 'px')
+  }
+
+  // ---- Wire a carousel up: size it, and if it has 5+ photos, start the loop ----
+  function setupCarousel(carousel) {
+    sizeCarousel(carousel)
+
+    // stop any previous animation loop before (re)starting — guards against a
+    // re-render or resize leaving an orphaned requestAnimationFrame running
+    if (carousel._marqueeStop) {
+      carousel._marqueeStop()
+      carousel._marqueeStop = null
+    }
+
+    const track = carousel.querySelector('.photo-track--marquee')
+    if (track) startMarquee(carousel, track, Number(carousel.dataset.count) || 0)
+  }
+
+  // ---- Smooth, jerk-free infinite loop: translateX a doubled track via requestAnimationFrame,
+  // wrapping the offset back by exactly one set's width so the loop seam is invisible ----
+  function startMarquee(carousel, track, count) {
+    const SPEED = 32 // pixels per second — tuned to feel like a gentle drift, not a scroll
+    let offset = 0
+    let lastTime = null
+    let paused = false
+    let rafId = null
+
+    function halfWidth() {
+      // the track holds two identical copies back-to-back, so half its scrollWidth
+      // is exactly the width of one full set — that's how far we travel before wrapping
+      return track.scrollWidth / 2
+    }
+
+    function step(t) {
+      if (lastTime === null) lastTime = t
+      const dt = (t - lastTime) / 1000
+      lastTime = t
+      if (!paused) {
+        const half = halfWidth()
+        if (half > 0) {
+          offset += SPEED * dt
+          if (offset >= half) offset -= half
+          track.style.transform = `translateX(${-offset}px)`
+        }
+      }
+      rafId = requestAnimationFrame(step)
+    }
+
+    const onEnter = () => { paused = true }
+    const onLeave = () => { paused = false }
+    carousel.addEventListener('mouseenter', onEnter)
+    carousel.addEventListener('mouseleave', onLeave)
+
+    // Only a horizontal scroll (trackpad two-finger swipe left/right) spins the loop —
+    // and only once the photo count reaches the spin threshold (5 on desktop, 3 on
+    // mobile). Below that it still auto-spins, but scrolling over it does nothing
+    // special, so the page keeps scrolling normally either direction.
+    let onWheel = null
+    if (count >= VISIBLE_SLOTS()) {
+      onWheel = (e) => {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return // vertical — let the page scroll
+        e.preventDefault()
+        const half = halfWidth()
+        if (half > 0) {
+          offset += e.deltaX
+          offset = ((offset % half) + half) % half // wrap both directions, stays in [0, half)
+          track.style.transform = `translateX(${-offset}px)`
+        }
+      }
+      carousel.addEventListener('wheel', onWheel, { passive: false })
+    }
+
+    rafId = requestAnimationFrame(step)
+
+    carousel._marqueeStop = () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      carousel.removeEventListener('mouseenter', onEnter)
+      carousel.removeEventListener('mouseleave', onLeave)
+      if (onWheel) carousel.removeEventListener('wheel', onWheel)
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div')
+    div.textContent = str
+    return div.innerHTML
+  }
+
+  // ---- Country codes: dial code + expected WhatsApp number length per country ----
+  const COUNTRY_CODES = [
+    { code: '+91',  name: 'India',          flag: '🇮🇳', min: 10, max: 10 },
+    { code: '+1',   name: 'USA / Canada',   flag: '🇺🇸', min: 10, max: 10 },
+    { code: '+44',  name: 'United Kingdom', flag: '🇬🇧', min: 10, max: 10 },
+    { code: '+61',  name: 'Australia',      flag: '🇦🇺', min: 9,  max: 9  },
+    { code: '+971', name: 'UAE',            flag: '🇦🇪', min: 9,  max: 9  },
+    { code: '+966', name: 'Saudi Arabia',   flag: '🇸🇦', min: 9,  max: 9  },
+    { code: '+974', name: 'Qatar',          flag: '🇶🇦', min: 8,  max: 8  },
+    { code: '+973', name: 'Bahrain',        flag: '🇧🇭', min: 8,  max: 8  },
+    { code: '+965', name: 'Kuwait',         flag: '🇰🇼', min: 8,  max: 8  },
+    { code: '+968', name: 'Oman',           flag: '🇴🇲', min: 8,  max: 8  },
+    { code: '+65',  name: 'Singapore',      flag: '🇸🇬', min: 8,  max: 8  },
+    { code: '+60',  name: 'Malaysia',       flag: '🇲🇾', min: 9,  max: 10 },
+    { code: '+92',  name: 'Pakistan',       flag: '🇵🇰', min: 10, max: 10 },
+    { code: '+880', name: 'Bangladesh',     flag: '🇧🇩', min: 10, max: 10 },
+    { code: '+94',  name: 'Sri Lanka',      flag: '🇱🇰', min: 9,  max: 9  },
+    { code: '+977', name: 'Nepal',          flag: '🇳🇵', min: 10, max: 10 },
+    { code: '+63',  name: 'Philippines',    flag: '🇵🇭', min: 10, max: 10 },
+    { code: '+62',  name: 'Indonesia',      flag: '🇮🇩', min: 9,  max: 12 },
+    { code: '+27',  name: 'South Africa',   flag: '🇿🇦', min: 9,  max: 9  },
+    { code: '+234', name: 'Nigeria',        flag: '🇳🇬', min: 10, max: 10 },
+    { code: '+20',  name: 'Egypt',          flag: '🇪🇬', min: 10, max: 10 },
+    { code: '+33',  name: 'France',         flag: '🇫🇷', min: 9,  max: 9  },
+    { code: '+49',  name: 'Germany',        flag: '🇩🇪', min: 10, max: 11 },
+    { code: '+39',  name: 'Italy',          flag: '🇮🇹', min: 9,  max: 10 },
+    { code: '+34',  name: 'Spain',          flag: '🇪🇸', min: 9,  max: 9  },
+    { code: '+7',   name: 'Russia',         flag: '🇷🇺', min: 10, max: 10 },
+    { code: '+86',  name: 'China',          flag: '🇨🇳', min: 11, max: 11 },
+    { code: '+81',  name: 'Japan',          flag: '🇯🇵', min: 10, max: 10 },
+    { code: '+82',  name: 'South Korea',    flag: '🇰🇷', min: 9,  max: 10 },
+    { code: '+55',  name: 'Brazil',         flag: '🇧🇷', min: 10, max: 11 },
+    { code: '+52',  name: 'Mexico',         flag: '🇲🇽', min: 10, max: 10 },
+  ]
+
+  // ---- Modal / wizard logic ----
+  const modalOverlay = document.getElementById('modalOverlay')
+  const modalTitle = document.getElementById('modalTitle')
+  const requestForm = document.getElementById('requestForm')
+  const nameInput = document.getElementById('nameInput')
+  const districtInput = document.getElementById('districtInput')
+  const phoneInput = document.getElementById('phoneInput')
+  const countryCodeInput = document.getElementById('countryCodeInput')
+  const phoneHint = document.getElementById('phoneHint')
+  const nftInput = document.getElementById('nftInput')
+  const identifierHeading = document.getElementById('identifierHeading')
+  const identifierHint = document.getElementById('identifierHint')
+  const identifierLabel = document.getElementById('identifierLabel')
+  const upgradeNotice = document.getElementById('upgradeNotice')
+  const upgradeNoticeText = document.getElementById('upgradeNoticeText')
+  const upgradeCancelBtn = document.getElementById('upgradeCancelBtn')
+  const upgradeConfirmBtn = document.getElementById('upgradeConfirmBtn')
+  const hofPhotoInput = document.getElementById('hofPhotoInput')
+  const proofPhotoInput = document.getElementById('proofPhotoInput')
+  const bigDrop = document.getElementById('bigDrop')
+  const photoPickView = document.getElementById('photoPickView')
+  const photoCropView = document.getElementById('photoCropView')
+  const choosePhotoAgainBtn = document.getElementById('choosePhotoAgainBtn')
+  const proofPhotoPreview = document.getElementById('proofPhotoPreview')
+  const proofPhotoLabel = document.getElementById('proofPhotoLabel')
+  const namePhotoPreview = document.getElementById('namePhotoPreview')
+  const formError = document.getElementById('formError')
+  const formSuccess = document.getElementById('formSuccess')
+  const submitBtn = document.getElementById('submitBtn')
+  const nextBtn = document.getElementById('nextBtn')
+  const backBtn = document.getElementById('backBtn')
+  const wizardNav = document.getElementById('wizardNav')
+  const stepDots = document.getElementById('stepDots')
+  const cropFrame = document.getElementById('cropFrame')
+  const cropCanvas = document.getElementById('cropCanvas')
+  const zoomRange = document.getElementById('zoomRange')
+
+  const TOTAL_STEPS = 6 // 0 photo (pick+crop), 1 name, 2 district, 3 phone, 4 identifier, 5 proof photo
+  let currentStep = 0
+  let croppedPhotoBlob = null   // final cropped Hall of Fame photo, as a Blob
+  let croppedPhotoUrl = null    // object URL for preview
+  let isUpgrade = false         // true once the person has confirmed this NFT is an upgrade of an existing member
+  let upgradeFromLevel = null   // the level the existing member is currently on, when isUpgrade is true
+
+  // populate country code select
+  COUNTRY_CODES.forEach((c, i) => {
+    const opt = document.createElement('option')
+    opt.value = String(i)
+    opt.textContent = `${c.flag} ${c.code} ${c.name}`
+    countryCodeInput.appendChild(opt)
+  })
+
+  function currentCountry() {
+    return COUNTRY_CODES[Number(countryCodeInput.value)] || COUNTRY_CODES[0]
+  }
+
+  function identifierName(board = activeBoard) {
+    return isTsBoard(board) ? 'Link ID' : 'Passport NFT'
+  }
+
+  function identifierIsValid(value, board = activeBoard) {
+    if (isTsBoard(board)) return /^[A-Za-z0-9]{10}$/.test(value)
+    return /^[0-9]{5}$/.test(value)
+  }
+
+  function updateIdentifierFields(board) {
+    const isTs = isTsBoard(board)
+    const name = identifierName(board)
+    identifierHeading.textContent = name
+    identifierHint.textContent = isTs
+      ? 'Enter the 10-character Link ID using letters and numbers.'
+      : 'Enter the 5-digit Passport NFT number.'
+    identifierLabel.textContent = isTs ? 'Link ID' : 'Passport NFT number'
+    document.getElementById('proofPhotoHint').textContent = `Upload a clear photo that verifies your ${name}.`
+    nftInput.placeholder = isTs ? 'e.g. aB12Cd3456' : 'e.g. 04821'
+    nftInput.inputMode = isTs ? 'text' : 'numeric'
+    nftInput.maxLength = isTs ? 10 : 5
+  }
+
+  function updatePhoneHint() {
+    const c = currentCountry()
+    const lenLabel = c.min === c.max ? `${c.min} digits` : `${c.min}–${c.max} digits`
+    phoneHint.textContent = `${c.name} numbers need ${lenLabel}.`
+    phoneInput.placeholder = c.min === c.max ? `${c.min} digit number` : `${lenLabel} number`
+    phoneInput.maxLength = c.max
+  }
+  countryCodeInput.addEventListener('change', () => {
+    // re-trim in case switching to a shorter country cuts off extra digits
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, currentCountry().max)
+    updatePhoneHint()
+  })
+  phoneInput.addEventListener('input', () => {
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, currentCountry().max)
+  })
+  nftInput.addEventListener('input', () => {
+    if (isTsBoard(activeBoard)) {
+      nftInput.value = nftInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 10)
+    } else {
+      nftInput.value = nftInput.value.replace(/\D/g, '').slice(0, 5)
+    }
+  })
+
+  upgradeCancelBtn.addEventListener('click', () => {
+    isUpgrade = false
+    upgradeFromLevel = null
+    upgradeNotice.classList.remove('open')
+    nftInput.disabled = false
+    nftInput.value = ''
+    nftInput.focus()
+    nextBtn.style.display = 'block'
+  })
+
+  upgradeConfirmBtn.addEventListener('click', () => {
+    upgradeNotice.classList.remove('open')
+    nftInput.disabled = false
+    showStep(5)
+  })
+
+  function renderDots() {
+    stepDots.innerHTML = ''
+    for (let i = 0; i < TOTAL_STEPS; i++) {
+      const dot = document.createElement('div')
+      dot.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '')
+      stepDots.appendChild(dot)
+    }
+  }
+
+  function showStep(step) {
+    currentStep = step
+    requestForm.querySelectorAll('.wizard-step').forEach((el) => {
+      el.classList.toggle('active', Number(el.dataset.step) === step)
+    })
+    renderDots()
+    formError.style.display = 'none'
+    backBtn.style.display = step === 0 ? 'none' : 'block'
+    const onPhotoPickSubview = step === 0 && !rawImage
+    nextBtn.style.display = (step === TOTAL_STEPS - 1 || onPhotoPickSubview) ? 'none' : 'block'
+    submitBtn.style.display = step === TOTAL_STEPS - 1 ? 'block' : 'none'
+    nextBtn.textContent = step === 0 ? 'OK' : 'Next'
+    if (step === 1) namePhotoPreview.src = croppedPhotoUrl || ''
+  }
+
+  function showError(msg) {
+    formError.textContent = msg
+    formError.style.display = 'block'
+    formError.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
+  function resetWizard() {
+    requestForm.reset()
+    croppedPhotoBlob = null
+    if (croppedPhotoUrl) URL.revokeObjectURL(croppedPhotoUrl)
+    croppedPhotoUrl = null
+    rawImage = null
+    photoPickView.style.display = 'block'
+    photoCropView.style.display = 'none'
+    proofPhotoPreview.style.display = 'none'
+    if (proofPhotoPreviewUrl) URL.revokeObjectURL(proofPhotoPreviewUrl)
+    proofPhotoPreviewUrl = null
+    proofPhotoPreview.removeAttribute('src')
+    proofPhotoLabel.style.display = 'block'
+    formError.style.display = 'none'
+    isUpgrade = false
+    upgradeFromLevel = null
+    upgradeNotice.classList.remove('open')
+    nftInput.disabled = false
+    formSuccess.style.display = 'none'
+    requestForm.style.display = 'block'
+    submitBtn.disabled = false
+    countryCodeInput.value = '0' // default India
+    updatePhoneHint()
+    showStep(0)
+  }
+
+  function openModal(board, level) {
+    activeBoard = board
+    activeLevel = level
+    modalTitle.textContent = `Request to add a member — ${BOARD_LABELS[board]} Level ${level}`
+    updateIdentifierFields(board)
+    resetWizard()
+    modalOverlay.classList.add('open')
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('open')
+    activeBoard = null
+    activeLevel = null
+  }
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal()
+  })
+
+  document.getElementById('successOkBtn').addEventListener('click', closeModal)
+
+  // ---- Step 0: photo picker -> switches straight into the crop subview ----
+  let rawImage = null // HTMLImageElement of the originally chosen file
+  const MAX_PHOTO_BYTES = 500 * 1024 // 500 KB
+  const MAX_PROOF_PHOTO_BYTES = 5 * 1024 * 1024 // 5 MB
+  let proofPhotoPreviewUrl = null
+  hofPhotoInput.addEventListener('change', () => {
+    const file = hofPhotoInput.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      hofPhotoInput.value = ''
+      showError('Please choose an image file for the Hall of Fame photo.')
+      return
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      showError(`That photo is ${(file.size / 1024).toFixed(0)} KB — please choose one under 100 KB.`)
+      hofPhotoInput.value = ''
+      return
+    }
+    const img = new Image()
+    img.onload = () => {
+      rawImage = img
+      photoPickView.style.display = 'none'
+      photoCropView.style.display = 'block'
+      startCropStage()
+      showStep(0) // refresh Back/Next visibility now that rawImage is set
+    }
+    img.onerror = () => showError('Could not read that image — please try another photo.')
+    img.src = URL.createObjectURL(file)
+  })
+
+  choosePhotoAgainBtn.addEventListener('click', () => {
+    rawImage = null
+    hofPhotoInput.value = ''
+    photoCropView.style.display = 'none'
+    photoPickView.style.display = 'block'
+    showStep(0)
+  })
+
+  // ---- Step 1: crop / reposition tool ----
+  const CROP_SIZE = 260
+  const ctx = cropCanvas.getContext('2d')
+  let cropState = { baseScale: 1, zoom: 1, offsetX: 0, offsetY: 0 }
+  let dragging = false
+  let dragStart = { x: 0, y: 0, offX: 0, offY: 0 }
+
+  function startCropStage() {
+    if (!rawImage) return
+    cropState.baseScale = Math.max(CROP_SIZE / rawImage.width, CROP_SIZE / rawImage.height)
+    cropState.zoom = 1
+    cropState.offsetX = 0
+    cropState.offsetY = 0
+    zoomRange.value = 100
+    drawCrop()
+  }
+
+  function drawCrop() {
+    if (!rawImage) return
+    const scale = cropState.baseScale * cropState.zoom
+    ctx.clearRect(0, 0, CROP_SIZE, CROP_SIZE)
+    ctx.save()
+    ctx.translate(CROP_SIZE / 2 + cropState.offsetX, CROP_SIZE / 2 + cropState.offsetY)
+    ctx.scale(scale, scale)
+    ctx.drawImage(rawImage, -rawImage.width / 2, -rawImage.height / 2)
+    ctx.restore()
+  }
+
+  function clampOffsets() {
+    const scale = cropState.baseScale * cropState.zoom
+    const halfW = (rawImage.width * scale) / 2
+    const halfH = (rawImage.height * scale) / 2
+    const maxX = Math.max(0, halfW - CROP_SIZE / 2)
+    const maxY = Math.max(0, halfH - CROP_SIZE / 2)
+    cropState.offsetX = Math.min(maxX, Math.max(-maxX, cropState.offsetX))
+    cropState.offsetY = Math.min(maxY, Math.max(-maxY, cropState.offsetY))
+  }
+
+  function pointerPos(e) {
+    if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    return { x: e.clientX, y: e.clientY }
+  }
+  function onDragStart(e) {
+    dragging = true
+    const p = pointerPos(e)
+    dragStart = { x: p.x, y: p.y, offX: cropState.offsetX, offY: cropState.offsetY }
+  }
+  function onDragMove(e) {
+    if (!dragging) return
+    const p = pointerPos(e)
+    cropState.offsetX = dragStart.offX + (p.x - dragStart.x)
+    cropState.offsetY = dragStart.offY + (p.y - dragStart.y)
+    clampOffsets()
+    drawCrop()
+  }
+  function onDragEnd() { dragging = false }
+
+  cropFrame.addEventListener('pointerdown', onDragStart)
+  window.addEventListener('pointermove', onDragMove)
+  window.addEventListener('pointerup', onDragEnd)
+  cropFrame.addEventListener('touchstart', onDragStart, { passive: true })
+  cropFrame.addEventListener('touchmove', (e) => { onDragMove(e); e.preventDefault() }, { passive: false })
+  cropFrame.addEventListener('touchend', onDragEnd)
+
+  zoomRange.addEventListener('input', () => {
+    cropState.zoom = Number(zoomRange.value) / 100
+    clampOffsets()
+    drawCrop()
+  })
+
+  function confirmCrop() {
+    return new Promise((resolve, reject) => {
+      const OUTPUT_SIZE = 480
+      const out = document.createElement('canvas')
+      out.width = OUTPUT_SIZE
+      out.height = OUTPUT_SIZE
+      const octx = out.getContext('2d')
+      const factor = OUTPUT_SIZE / CROP_SIZE
+      const scale = cropState.baseScale * cropState.zoom * factor
+      octx.save()
+      octx.translate(OUTPUT_SIZE / 2 + cropState.offsetX * factor, OUTPUT_SIZE / 2 + cropState.offsetY * factor)
+      octx.scale(scale, scale)
+      octx.drawImage(rawImage, -rawImage.width / 2, -rawImage.height / 2)
+      octx.restore()
+      out.toBlob((blob) => {
+        if (!blob) return reject(new Error('Could not process the photo.'))
+        resolve(blob)
+      }, 'image/jpeg', 0.92)
+    })
+  }
+
+  // ---- Step 5: proof photo preview ----
+  proofPhotoInput.addEventListener('change', () => {
+    const file = proofPhotoInput.files[0]
+    if (!file) {
+      proofPhotoPreview.style.display = 'none'
+      proofPhotoLabel.style.display = 'block'
+      return
+    }
+    if (!file.type.startsWith('image/')) {
+      proofPhotoInput.value = ''
+      proofPhotoPreview.style.display = 'none'
+      proofPhotoLabel.style.display = 'block'
+      showError('Please choose an image file for the proof photo.')
+      return
+    }
+    if (file.size > MAX_PROOF_PHOTO_BYTES) {
+      proofPhotoInput.value = ''
+      proofPhotoPreview.style.display = 'none'
+      proofPhotoLabel.style.display = 'block'
+      showError('Proof photo must be smaller than 5 MB.')
+      return
+    }
+    if (proofPhotoPreviewUrl) URL.revokeObjectURL(proofPhotoPreviewUrl)
+    proofPhotoPreviewUrl = URL.createObjectURL(file)
+    proofPhotoPreview.src = proofPhotoPreviewUrl
+    proofPhotoPreview.style.display = 'block'
+    proofPhotoLabel.style.display = 'none'
+  })
+
+  // ---- Board-specific identifier duplicate check ----
+  // Looks in both the approved members table and the pending requests table so we
+  // catch a number that's already on the board AND one that's already waiting for review.
+  async function findExistingNft(nft) {
+    const { data: memberRows, error: memberErr } = await supabase
+      .from('members')
+      .select('board, level')
+      .eq('passport_nft', nft)
+      .limit(1)
+    if (memberErr) throw memberErr
+    if (memberRows && memberRows.length) return memberRows[0]
+
+    const { data: requestRows, error: reqErr } = await supabase
+      .from('requests')
+      .select('board, level')
+      .eq('passport_nft', nft)
+      .limit(1)
+    if (reqErr) throw reqErr
+    if (requestRows && requestRows.length) return requestRows[0]
+
+    return null
+  }
+
+  // ---- Navigation ----
+  backBtn.addEventListener('click', () => {
+    if (currentStep === 0) return
+    showStep(currentStep - 1)
+  })
+
+  nextBtn.addEventListener('click', async () => {
+    formError.style.display = 'none'
+
+    if (currentStep === 0) {
+      // "OK" on the crop subview
+      try {
+        croppedPhotoBlob = await confirmCrop()
+        if (croppedPhotoUrl) URL.revokeObjectURL(croppedPhotoUrl)
+        croppedPhotoUrl = URL.createObjectURL(croppedPhotoBlob)
+      } catch (err) {
+        showError(err.message || 'Could not process the photo.')
+        return
+      }
+      showStep(1)
+      return
+    }
+
+    if (currentStep === 1) {
+      if (!nameInput.value.trim()) { showError('Please enter the full name.'); return }
+      showStep(2)
+      return
+    }
+
+    if (currentStep === 2) {
+      if (!districtInput.value.trim()) { showError('Please enter the district.'); return }
+      showStep(3)
+      return
+    }
+
+    if (currentStep === 3) {
+      const digits = phoneInput.value.trim()
+      const c = currentCountry()
+      if (digits.length < c.min || digits.length > c.max) {
+        const lenLabel = c.min === c.max ? `exactly ${c.min} digits` : `${c.min}–${c.max} digits`
+        showError(`Enter a valid WhatsApp number — ${c.name} needs ${lenLabel}.`)
+        return
+      }
+      showStep(4)
+      return
+    }
+
+    if (currentStep === 4) {
+      const nft = nftInput.value.trim()
+      if (!identifierIsValid(nft)) {
+        showError(isTsBoard(activeBoard)
+          ? 'Link ID must be exactly 10 characters.'
+          : 'Passport NFT must be exactly 5 digits.')
+        return
+      }
+
+      nextBtn.disabled = true
+      const prevNextLabel = nextBtn.textContent
+      nextBtn.textContent = 'Checking…'
+      try {
+        const existing = await findExistingNft(nft)
+        if (existing) {
+          if (existing.board === activeBoard && existing.level === Number(activeLevel)) {
+            // Same board, same level — this is a straight duplicate, not an upgrade.
+            showError(`${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}.`)
+            return
+          }
+          // Found elsewhere — offer to continue as an upgrade/transfer to the level
+          // they picked. This also covers moving between boards.
+          isUpgrade = true
+          upgradeFromLevel = existing.level
+          upgradeNoticeText.textContent = `${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}. Do you want to upgrade to ${BOARD_LABELS[activeBoard]} Level ${activeLevel} and continue?`
+          upgradeNotice.classList.add('open')
+          nftInput.disabled = true
+          nextBtn.style.display = 'none'
+          return
+        }
+        isUpgrade = false
+        upgradeFromLevel = null
+      } catch (err) {
+        console.error(err)
+        showError(`Could not verify the ${identifierName(activeBoard)} — please try again.`)
+        return
+      } finally {
+        nextBtn.disabled = false
+        nextBtn.textContent = prevNextLabel
+      }
+
+      showStep(5)
+      return
+    }
+
+    showStep(Math.min(currentStep + 1, TOTAL_STEPS - 1))
+  })
+
+  async function uploadPhoto(file, board, level) {
+    const ext = (file.name && file.name.split('.').pop()) || 'jpg'
+    const path = `${board}/${level}/${crypto.randomUUID()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+    if (uploadError) throw uploadError
+    const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path)
+    return data.publicUrl
+  }
+
+  requestForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    formError.style.display = 'none'
+
+    const name = nameInput.value.trim()
+    const district = districtInput.value.trim()
+    const c = currentCountry()
+    const fullPhone = `${c.code}${phoneInput.value.trim()}`
+    const nft = nftInput.value.trim()
+    const proofPhoto = proofPhotoInput.files[0]
+
+    if (!name || !district || !croppedPhotoBlob || phoneInput.value.trim().length < c.min || !identifierIsValid(nft) || !proofPhoto || !proofPhoto.type.startsWith('image/') || proofPhoto.size > MAX_PROOF_PHOTO_BYTES) {
+      showError('Please complete every step before submitting.')
+      return
+    }
+
+    submitBtn.disabled = true
+    submitBtn.textContent = 'Submitting…'
+
+    try {
+      // last-moment re-check in case someone else grabbed this NFT number while this
+      // person was filling out the rest of the form
+      const existing = await findExistingNft(nft)
+      if (existing) {
+        const isExpectedUpgradeTarget = isUpgrade && existing.level === upgradeFromLevel
+        if (!isExpectedUpgradeTarget) {
+          showStep(4)
+          showError(`${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}.`)
+          return
+        }
+      }
+
+      const hofPhotoFile = new File([croppedPhotoBlob], 'hall-of-fame.jpg', { type: 'image/jpeg' })
+      const [hofPhotoUrl, proofPhotoUrl] = await Promise.all([
+        uploadPhoto(hofPhotoFile, activeBoard, activeLevel),
+        uploadPhoto(proofPhoto, activeBoard, activeLevel),
+      ])
+
+      const { error: insertError } = await supabase.from('requests').insert({
+        board: activeBoard,
+        level: Number(activeLevel),
+        name,
+        district,
+        phone: fullPhone,
+        passport_nft: nft,
+        photo_url: hofPhotoUrl,
+        proof_photo_url: proofPhotoUrl,
+        is_upgrade: isUpgrade,
+        upgrade_from_level: isUpgrade ? upgradeFromLevel : null,
+      })
+      if (insertError) {
+        if (insertError.code === '23505' && !isUpgrade) {
+          showStep(4)
+          showError(`${identifierName(activeBoard)} ${nft} is already there — someone just registered it.`)
+          return
+        }
+        throw insertError
+      }
+
+      requestForm.style.display = 'none'
+      formSuccess.style.display = 'block'
+      formSuccess.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    } catch (err) {
+      console.error(err)
+      showError(err.message || 'Something went wrong. Please try again.')
+    } finally {
+      submitBtn.disabled = false
+      submitBtn.textContent = 'Submit'
+    }
+  })
+
+  // ---- Init + realtime ----
+  loadMembers()
+
+  supabase
+    .channel('members-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, () => {
+      loadMembers()
+    })
+    .subscribe()
+
+  // Safety net: if a realtime event is ever missed (dropped websocket, or Realtime
+  // not enabled for this table in the Supabase dashboard), this guarantees the
+  // roster still catches up — every 15s, and instantly whenever the tab regains focus.
+  setInterval(loadMembers, 15000)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadMembers()
+  })
+
+  let resizeTimer = null
+  window.addEventListener('resize', () => {
+    // Debounced: a plain resize only needs the photos re-sized, but if the resize
+    // crosses the mobile breakpoint, the static/spinning threshold (3 vs 5) changes
+    // too, so a full render() is safest — it's cheap since it's all in-memory data.
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(render, 120)
+  })
+</script>
 </body>
 </html>
