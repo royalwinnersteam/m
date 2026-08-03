@@ -6,14 +6,17 @@
 <title>Hall of Fame - Meta Whale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
     --bg: #0a0e17; --panel: #161a23; --panel-hover: #1c2130; --line: #262c3a;
     --gold: #e8b65a; --gold-dim: #7a6636; --text: #edeff4; --muted: #8a90a3;
     --danger: #e0685f; --success: #62b583;
     --whale-blue: #4fc3e0; --whale-blue-light: #cdf1ff; --whale-navy: #0c1c33;
+    --royal-blue: #3a5cf5; --royal-gold: #f0c060;
     --font-display: 'Archivo Black', 'Inter', sans-serif;
+    --font-title: 'Cinzel', 'Archivo Black', serif;
     --font-body: 'Inter', system-ui, sans-serif;
     --font-mono: 'Roboto Mono', monospace;
   }
@@ -31,14 +34,14 @@
   }
 
   /* Full-bleed app shell — fills the viewport instead of sitting in a narrow column */
-  .app { width: 100%; max-width: 1440px; margin: 0 auto; padding: 32px clamp(20px, 4vw, 56px) 80px; }
+  .app { width: 100%; max-width: 1440px; margin: 0 auto; padding: 32px clamp(20px, 4vw, 56px) 80px; position: relative; }
 
   .header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; margin-bottom: 28px; }
   .header-brand-col { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; grid-column: 1; justify-self: start; }
   .header-brand { display: flex; align-items: center; gap: 12px; }
   .header-right{ grid-column: 3; justify-self: end; align-self: start; min-width: 0; max-width: 100%; }
   .royal-logo {
-    height: auto; width: auto; max-height: 150px; max-width: 100%; flex-shrink: 0; display: block;
+    height: auto; width: auto; max-height: 200px; max-width: 100%; flex-shrink: 0; display: block;
     object-fit: contain; background: transparent;
     filter: drop-shadow(0 4px 10px rgba(232, 182, 90, 0.35));
   }
@@ -49,6 +52,7 @@
   }
   .header-title {
     font-family: var(--font-display); font-size: 17px; letter-spacing: 0.8px; text-transform: uppercase;
+    white-space: nowrap;
     background: linear-gradient(100deg, var(--whale-blue-light) 0%, var(--whale-blue) 45%, #eaf9ff 70%, var(--whale-blue) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
@@ -56,10 +60,12 @@
     grid-column: 2; justify-self: center; text-align: center;
   }
   .super-title {
-    font-family: var(--font-display); font-size: clamp(16px, 2vw, 24px); letter-spacing: 2px;
-    text-transform: uppercase; white-space: nowrap; margin-bottom: 4px; transform: translateY(-25px);
-    color: var(--whale-blue-light);
-    text-shadow: 0 0 16px rgba(79, 195, 224, 0.35);
+    font-family: var(--font-title); font-size: clamp(16px, 2vw, 24px); letter-spacing: 4px; font-weight: 900;
+    text-transform: uppercase; white-space: nowrap; margin-bottom: 6px; transform: translateY(-25px);
+    background: linear-gradient(90deg, var(--whale-blue) 0%, var(--whale-blue-light) 35%, var(--gold) 65%, var(--gold) 100%);
+    background-size: 100% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 18px rgba(79, 195, 224, 0.3);
   }
   .site-title {
     font-family: var(--font-display); font-size: clamp(22px, 4vw, 34px); letter-spacing: 3px;
@@ -80,9 +86,55 @@
     .site-title-wrap { grid-column: 1; order: -1; }
     .site-title, .super-title { white-space: normal; }
     .header-right { grid-column: 1; justify-self: center; align-self: center; max-width: 100%; }
-    .royal-logo { height: auto; width: 130px; max-width: 60%; }
+    .royal-logo { height: auto; width: clamp(190px, 50vw, 300px); max-width: 80%; }
+  }
+  /* Phones/tablets requesting the "Desktop site" get a viewport wide enough to
+     skip the max-width:720px rules above, so the logo would otherwise fall back
+     to the flat 150px meant for real mouse-driven desktops. Target touchscreens
+     specifically (pointer: coarse) so actual laptops/desktops are untouched. */
+  @media (min-width: 721px) and (pointer: coarse) {
+    .royal-logo { max-height: clamp(190px, 20vw, 290px); }
   }
   .header-sub { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ---- Contact chip: its own centered row above the header ---- */
+  .contact-chip-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;   /* Space above it */
+    margin-bottom: 20px;
+  }
+  .contact-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px 9px 12px; border-radius: 999px;
+    background: linear-gradient(180deg, rgba(22, 26, 35, 0.9), rgba(12, 16, 24, 0.9));
+    border: 1px solid var(--gold-dim);
+    text-decoration: none; color: var(--text);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .contact-chip:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(232, 182, 90, 0.25);
+  }
+  .contact-chip-icon {
+    width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 30% 30%, var(--whale-blue-light), var(--whale-blue) 70%);
+  }
+  .contact-chip-icon svg { width: 15px; height: 15px; }
+  .contact-chip-text { display: flex; flex-direction: column; line-height: 1.25; }
+  .contact-chip-label {
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .contact-chip-number {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
 
   /* ---- Board tabs: switch between the two lists on this one page ---- */
   .board-header{
@@ -98,6 +150,11 @@
     color: var(--gold);
     letter-spacing: 1px;
   }
+  .board-label-name {
+    background: linear-gradient(135deg, #ffe9a8 0%, var(--gold) 30%, var(--whale-blue) 70%, var(--whale-blue-light) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 16px rgba(79, 195, 224, 0.25);
+  }
 
   .board-tabs { display: flex; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; margin-left: 0; margin-bottom: 0; }
   .board-tab { border: none; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 700; font-size: 13px; padding: 10px 22px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
@@ -106,7 +163,9 @@
   .level-list { display: flex; flex-direction: column; }
   .level-row { display: flex; align-items: center; gap: 20px; padding: 20px 4px; border-bottom: 1px solid var(--line); }
   .level-row:last-child { border-bottom: none; }
-  .level-tag { font-family: var(--font-display); font-size: 20px; color: var(--gold); width: 120px; flex-shrink: 0; line-height: 1; }
+  .level-tag { display: flex; flex-direction: column; gap: 2px; width: 120px; flex-shrink: 0; line-height: 1.15; }
+  .level-tag-board { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .level-tag-level { font-family: var(--font-display); font-size: 20px; color: var(--gold); }
 
   /* ---- Photo row: 1-4 photos are static, evenly spread & centered; 5+ spin in a loop ---- */
   .carousel-wrap { flex: 1; min-width: 0; overflow: hidden; }
@@ -121,6 +180,8 @@
   }
   .photo-track--static { justify-content: space-evenly; width: 100%; }
   .photo-track--marquee { will-change: transform; }
+  .photo-carousel.draggable { cursor: grab; user-select: none; }
+  .photo-carousel.draggable.dragging { cursor: grabbing; }
   .photo-card {
     flex: 0 0 auto; width: var(--card-size);
     display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -134,13 +195,31 @@
     pointer-events: none;
   }
   .photo-name {
-    font-size: 14px; font-weight: 700; color: var(--text); text-align: center;
+    font-size: 14px; font-weight: 700; color: var(--gold); text-align: center;
     max-width: calc(var(--card-size) + 22px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .photo-district {
-    font-size: 11px; font-weight: 500; color: var(--muted); text-align: center;
+    font-size: 11px; font-weight: 500; color: #c7cad6; text-align: center;
     max-width: calc(var(--card-size) + 22px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     margin-top: -2px;
+  }
+  .photo-date {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--whale-blue); text-align: center;
+    max-width: calc(var(--card-size) + 22px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 1px; letter-spacing: 0.02em;
+  }
+  .photo-new-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 2px; padding: 2px 8px; border-radius: 999px;
+    font-family: var(--font-display); font-size: 9px; letter-spacing: 0.6px; text-transform: uppercase;
+    color: #2a1c05;
+    background: linear-gradient(135deg, #fff3d6 0%, var(--gold) 45%, #b9862f 100%);
+    box-shadow: 0 2px 6px rgba(232, 182, 90, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    animation: newGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes newGlow {
+    0%, 100% { box-shadow: 0 2px 6px rgba(232, 182, 90, 0.45), inset 0 1px 0 rgba(255,255,255,0.5); }
+    50% { box-shadow: 0 2px 12px rgba(232, 182, 90, 0.85), inset 0 1px 0 rgba(255,255,255,0.6); }
   }
 
   /* ---- 3D-styled add button ---- */
@@ -235,6 +314,79 @@
   .field-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
   .wizard-nav { display: flex; gap: 10px; margin-top: 22px; }
+
+  /* ---- Photo cards are clickable to open the ID card ---- */
+  .photo-card { cursor: pointer; }
+  .photo-card:hover .photo-square { filter: brightness(1.08); box-shadow: 0 6px 18px rgba(232,182,90,0.4); }
+
+  /* ---- ID Card modal ---- */
+  .idcard-overlay { position: fixed; inset: 0; background: rgba(6,7,11,0.8); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 60; }
+  .idcard-overlay.open { display: flex; }
+  .idcard-modal { width: 100%; max-width: 360px; max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .idcard-close { align-self: flex-end; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; line-height: 1; padding: 4px 8px; }
+  .idcard-close:hover { color: var(--text); }
+
+  .idcard {
+    width: 100%; max-width: 320px; border-radius: 20px; overflow: hidden;
+    background:
+      radial-gradient(ellipse 260px 160px at 15% -10%, rgba(79, 195, 224, 0.16), transparent 60%),
+      radial-gradient(ellipse 220px 160px at 100% 0%, rgba(232, 182, 90, 0.12), transparent 55%),
+      linear-gradient(180deg, #141a29 0%, #0a0e17 100%);
+    box-shadow: 0 16px 44px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,195,224,0.18);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 22px 20px 18px;
+  }
+  .idcard-header {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+    margin-bottom: 16px; width: 100%; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+  }
+  .idcard-logo {
+    width: 60px; height: auto; object-fit: contain; background: transparent; display: block; flex-shrink: 0;
+    filter: drop-shadow(0 4px 10px rgba(79, 195, 224, 0.35));
+  }
+  .idcard-royal-logo {
+    width: 60px; height: auto; object-fit: contain; background: transparent; display: block; flex-shrink: 0; justify-self: end;
+    filter: drop-shadow(0 4px 10px rgba(232, 182, 90, 0.35));
+  }
+  .idcard-title {
+    font-family: var(--font-title); font-size: 22px; font-weight: 900; letter-spacing: 2px;
+    text-transform: uppercase; text-align: left;
+    background: linear-gradient(90deg, var(--royal-blue) 0%, var(--royal-gold) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .idcard-photo-wrap { width: 150px; height: 150px; border-radius: 14px; overflow: hidden; border: 3px solid var(--gold); box-shadow: 0 6px 18px rgba(232,182,90,0.25); margin-bottom: 14px; background: #1c2130; }
+  .idcard-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .idcard-details { text-align: center; margin-bottom: 16px; }
+  .idcard-name { font-family: var(--font-display); font-size: 19px; color: var(--gold); margin-bottom: 4px; }
+  .idcard-district { font-size: 13px; font-weight: 600; color: var(--whale-blue-light); margin-bottom: 4px; }
+  .idcard-date { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .idcard-level { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.15; margin-bottom: 12px; }
+  .idcard-level-board { font-family: var(--font-body); font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .idcard-level-value { font-family: var(--font-display); font-size: 20px; color: var(--gold); }
+  .idcard-footer { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); border-top: 1px solid var(--line); padding-top: 10px; width: 100%; text-align: center; }
+
+  .idcard-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+  .idcard-action-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    border-radius: 12px; padding: 10px 6px; cursor: pointer; font-family: var(--font-body);
+    font-size: 11px; font-weight: 600;
+  }
+  .idcard-action-btn:hover { border-color: var(--gold); background: var(--panel-hover); }
+  .idcard-action-btn svg { width: 20px; height: 20px; }
+  .idcard-action-status { font-size: 11px; color: var(--muted); text-align: center; min-height: 14px; }
+
+  /* ---- Capture-safe fallback ----
+     html2canvas can throw on the card's multi-layer radial-gradient background
+     and on gradient-clipped ("Vistory") text. This class is added to the card
+     for the split second it's being turned into an image, swapping those in
+     for flat equivalents it can render reliably, then removed right after —
+     the on-screen look never changes. */
+  .idcard.capturing { background: linear-gradient(180deg, #141a29 0%, #0a0e17 100%) !important; }
+  .idcard.capturing .idcard-title {
+    background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important;
+    -webkit-text-fill-color: initial !important; color: var(--royal-gold) !important;
+  }
 </style>
 </head>
 <body>
@@ -264,7 +416,7 @@
 
   <div class="board-header">
       <div class="board-label" id="boardLabel">
-          Members in V-BOOST
+          Members <span class="board-label-name" id="boardLabelName">in V-BOOST</span>
       </div>
 
       <div class="board-tabs" id="boardTabs">
@@ -276,6 +428,21 @@
   </div>
   
   <div class="level-list" id="levelList"></div>
+
+  <div class="contact-chip-row">
+    <a class="contact-chip" href="tel:+918883442000">
+      <span class="contact-chip-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.6 10.2c1.3 2.6 3.4 4.7 6 6l2-2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V19c0 .6-.4 1-1 1C10.4 20 4 13.6 4 5.9c0-.5.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2 1.8Z" fill="#0c1c33"/>
+        </svg>
+      </span>
+      <span class="contact-chip-text">
+        <span class="contact-chip-label">Any enquiry? Call us</span>
+        <span class="contact-chip-number">+91 88834 42000</span>
+      </span>
+    </a>
+  </div>
+
 </div>
 
 <!-- Modal -->
@@ -402,6 +569,47 @@
   </div>
 </div>
 
+<!-- ID Card modal: opens when a photo in the roster is tapped -->
+<div class="idcard-overlay" id="idCardOverlay">
+  <div class="idcard-modal">
+    <button type="button" class="idcard-close" id="idCardCloseBtn" aria-label="Close">&times;</button>
+
+    <div class="idcard" id="idCardEl">
+      <div class="idcard-header">
+        <img class="idcard-logo" src="v.png" alt="V" />
+        <div class="idcard-title">Vistory</div>
+        <img class="idcard-royal-logo" src="rwt.png" alt="RWT" />
+      </div>
+      <div class="idcard-level" id="idCardLevel"></div>
+      <div class="idcard-photo-wrap">
+        <img class="idcard-photo" id="idCardPhoto" crossorigin="anonymous" alt="" />
+      </div>
+      <div class="idcard-details">
+        <div class="idcard-name" id="idCardName"></div>
+        <div class="idcard-district" id="idCardDistrict"></div>
+        <div class="idcard-date" id="idCardDate"></div>
+      </div>
+      <div class="idcard-footer">Royal Spark Winners Team</div>
+    </div>
+
+    <div class="idcard-actions">
+      <button type="button" class="idcard-action-btn" id="idCardDownloadBtn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19h16" stroke="#e8b65a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download
+      </button>
+      <button type="button" class="idcard-action-btn" id="idCardShareBtn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 0 6c.35 0 .68-.06 1-.17l-6.03 3.5a3 3 0 1 0 0 3.34L16 20.17A3 3 0 1 0 18 16a3 3 0 0 0-1 .17l-6.03-3.5a3 3 0 0 0 0-1.34L17 8.17c.32.11.65.17 1 .17Z" stroke="#e8b65a" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Share
+      </button>
+      <button type="button" class="idcard-action-btn" id="idCardCopyLinkBtn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 14a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.14" stroke="#e8b65a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 10a5 5 0 0 0-7.07 0l-2 2a5 5 0 0 0 7.07 7.07l1.14-1.14" stroke="#e8b65a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Copy Link
+      </button>
+    </div>
+    <div class="idcard-action-status" id="idCardStatus"></div>
+  </div>
+</div>
+
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -424,8 +632,14 @@
   // just with 30 levels instead of 10/12, and their own level-tag wording.
   function isDirectBoard(board) { return board === 'vboost_direct' || board === 'ts_direct' }
   function isTsBoard(board) { return board === 'ts' || board === 'ts_direct' }
+  // Level boards and their paired Direct board (vboost <-> vboost_direct, ts <-> ts_direct)
+  // are allowed to share the same NFT/ID — they're the same category, so no cross-board
+  // block or upgrade prompt should happen between the two.
+  function isPairedBoard(boardA, boardB) { return boardA !== boardB && isTsBoard(boardA) === isTsBoard(boardB) }
   function levelTagLabel(board, level) {
-    return isDirectBoard(board) ? `${level} Direct` : `Level ${level}`
+    const boardName = isTsBoard(board) ? 'T&S' : 'V-Boost'
+    const line2 = isDirectBoard(board) ? `${level} Direct` : `Level ${level}`
+    return `<span class="level-tag-board">${boardName}</span><span class="level-tag-level">${line2}</span>`
   }
   const VISIBLE_SLOTS = 5 // photos are sized so exactly this many fill the row, centered between the level and the + button
   const CARD_GAP = 14 // px between photos — must match the .photo-carousel CSS gap
@@ -450,7 +664,7 @@
 
   let lastMembersSignature = null
   function membersSignature(rows) {
-    return rows.map((r) => `${r.id}:${r.board}:${r.level}:${r.name}:${r.district}:${r.photo_url}`).sort().join('|')
+    return rows.map((r) => `${r.id}:${r.board}:${r.level}:${r.name}:${r.district}:${r.photo_url}:${r.submitted_at}`).sort().join('|')
   }
 
   async function loadMembers() {
@@ -475,15 +689,16 @@
 
     allMembers = data
     render()
+    maybeOpenSharedCardFromUrl()
   }
 
-  const boardLabel = document.getElementById("boardLabel");
+  const boardLabelName = document.getElementById("boardLabelName");
 
   function render() {
     boardTabs.querySelectorAll('.board-tab').forEach((tab) => {
       tab.classList.toggle('active', tab.dataset.board === currentBoard)
     })
-    boardLabel.textContent = `Members in ${BOARD_LABELS[currentBoard] || currentBoard}`
+    boardLabelName.textContent = `in ${BOARD_LABELS[currentBoard] || currentBoard}`
 
     const LEVELS = levelsFor(currentBoard)
     membersByLevel = {}
@@ -492,7 +707,7 @@
       if (!membersByLevel[row.level]) membersByLevel[row.level] = []
       membersByLevel[row.level].push(row)
     }
-    headerSub.textContent = `${BOARD_LABELS[currentBoard]} — ${LEVELS.length} levels`
+    headerSub.textContent = `${BOARD_LABELS[currentBoard]}`
 
     levelListEl.innerHTML = ''
     for (const level of LEVELS) {
@@ -531,6 +746,15 @@
       btn.addEventListener('click', () => openModal(currentBoard, btn.dataset.level))
     })
 
+    // wire up photo cards: tap a photo to open its ID card
+    levelListEl.querySelectorAll('.photo-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.memberId
+        const member = allMembers.find((mm) => String(mm.id) === id)
+        if (member) openIdCard(member)
+      })
+    })
+
     // wire up carousels: size the photos (fixed size) and start the seamless
     // auto-scrolling loop for any level with 5+ photos (1-4 stay static)
     levelListEl.querySelectorAll('.photo-carousel').forEach((carousel) => {
@@ -538,12 +762,44 @@
     })
   }
 
+  // The date shown to visitors is the date the member originally *submitted*
+  // their request (submitted_at), not the date an admin happened to accept it
+  // (created_at on the members row). Older rows inserted before this field
+  // existed fall back to created_at so nothing breaks.
+  function memberDisplayDate(m) {
+    return m.submitted_at || m.created_at
+  }
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return ''
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    return `${dd}-${mm}-${yyyy}`
+  }
+
+  function isSameLocalDay(dateStr, ref) {
+    if (!dateStr) return false
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return false
+    return d.getFullYear() === ref.getFullYear() &&
+      d.getMonth() === ref.getMonth() &&
+      d.getDate() === ref.getDate()
+  }
+
   function renderPhotoCard(m) {
+    const displayDate = memberDisplayDate(m)
+    const dateLabel = formatDisplayDate(displayDate)
+    const isNew = isSameLocalDay(displayDate, new Date())
     return `
-      <div class="photo-card">
+      <div class="photo-card" data-member-id="${escapeHtml(String(m.id))}">
         <img class="photo-square" src="${escapeHtml(m.photo_url)}" alt="${escapeHtml(m.name)}" />
         <div class="photo-name">${escapeHtml(m.name)}</div>
         ${m.district ? `<div class="photo-district">${escapeHtml(m.district)}</div>` : ''}
+        ${dateLabel ? `<div class="photo-date">${dateLabel}</div>` : ''}
+        ${isNew ? `<div class="photo-new-badge">New</div>` : ''}
       </div>
     `
   }
@@ -608,9 +864,10 @@
     carousel.addEventListener('mouseenter', onEnter)
     carousel.addEventListener('mouseleave', onLeave)
 
-    // Only a horizontal scroll (trackpad two-finger swipe left/right) spins the loop —
-    // and only for 5+ photos. With 1-4 photos it still auto-spins, but scrolling over
-    // it does nothing special, so the page keeps scrolling normally either direction.
+    // Horizontal gestures spin the loop — trackpad two-finger swipe left/right, or
+    // holding Shift while using a plain mouse wheel (the standard "make this wheel
+    // horizontal" convention). A normal up/down scroll is left alone so the page
+    // keeps scrolling vertically like anywhere else. Only for 5+ photos.
     let onWheel = null
     // Touch swipe — same idea as the wheel handler above, but for mobile where there's
     // no hover/wheel. A horizontal drag moves the track directly; the marquee just
@@ -618,11 +875,14 @@
     let onTouchStart = null, onTouchMove = null, onTouchEnd = null
     if (count >= VISIBLE_SLOTS) {
       onWheel = (e) => {
-        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return // vertical — let the page scroll
+        let delta
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) delta = e.deltaX // trackpad horizontal swipe
+        else if (e.shiftKey) delta = e.deltaY // Shift + mouse wheel -> horizontal
+        else return // plain vertical scroll — let the page scroll normally
         e.preventDefault()
         const half = halfWidth()
         if (half > 0) {
-          offset += e.deltaX
+          offset += delta
           offset = ((offset % half) + half) % half // wrap both directions, stays in [0, half)
           track.style.transform = `translateX(${-offset}px)`
         }
@@ -661,6 +921,41 @@
       carousel.addEventListener('touchmove', onTouchMove, { passive: false })
       carousel.addEventListener('touchend', onTouchEnd, { passive: true })
       carousel.addEventListener('touchcancel', onTouchEnd, { passive: true })
+
+      // Click-and-drag — the discoverable way to scroll left/right with a plain mouse.
+      let mouseStartX = 0, mouseStartOffset = 0, mouseDragging = false
+      const onMouseDown = (e) => {
+        mouseStartX = e.clientX
+        mouseStartOffset = offset
+        mouseDragging = true
+        paused = true
+        carousel.classList.add('dragging')
+      }
+      const onMouseMove = (e) => {
+        if (!mouseDragging) return
+        e.preventDefault()
+        const dx = mouseStartX - e.clientX
+        const half = halfWidth()
+        if (half > 0) {
+          offset = ((mouseStartOffset + dx) % half + half) % half
+          track.style.transform = `translateX(${-offset}px)`
+        }
+      }
+      const onMouseUp = () => {
+        if (!mouseDragging) return
+        mouseDragging = false
+        paused = false // hand it back to the drift once released
+        carousel.classList.remove('dragging')
+      }
+      carousel.addEventListener('mousedown', onMouseDown)
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
+      carousel.classList.add('draggable')
+      carousel._dragCleanup = () => {
+        carousel.removeEventListener('mousedown', onMouseDown)
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+      }
     }
 
     rafId = requestAnimationFrame(step)
@@ -676,6 +971,7 @@
         carousel.removeEventListener('touchend', onTouchEnd)
         carousel.removeEventListener('touchcancel', onTouchEnd)
       }
+      if (carousel._dragCleanup) { carousel._dragCleanup(); carousel._dragCleanup = null }
     }
   }
 
@@ -929,7 +1225,7 @@
       return
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      showError(`That photo is ${(file.size / 1024).toFixed(0)} KB — please choose one under 100 KB.`)
+      showError(`That photo is ${(file.size / 1024).toFixed(0)} KB — please choose one under 500 KB.`)
       hofPhotoInput.value = ''
       return
     }
@@ -1157,14 +1453,28 @@
       nextBtn.textContent = 'Checking…'
       try {
         const existing = await findExistingNft(nft)
-        if (existing) {
+        if (existing && isPairedBoard(existing.board, activeBoard)) {
+          // Same NFT/ID already sits on the paired board (Level <-> Direct within the
+          // same category) — that's allowed, so treat this as a fresh registration.
+          isUpgrade = false
+          upgradeFromLevel = null
+        } else if (existing) {
           if (existing.board === activeBoard && existing.level === Number(activeLevel)) {
             // Same board, same level — this is a straight duplicate, not an upgrade.
             showError(`${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}.`)
             return
           }
-          // Found elsewhere — offer to continue as an upgrade/transfer to the level
-          // they picked. This also covers moving between boards.
+          if (existing.board !== activeBoard) {
+            // Found on a different, non-paired board (e.g. already in V-Boost Level/Direct
+            // while trying to add to T&S Level/Direct). Paired boards (Level <-> its own
+            // Direct) are already handled above and never reach this branch. This is NOT
+            // an upgrade — block it outright instead of offering a cross-category
+            // "upgrade" that would just get rejected later.
+            showError(`${identifierName(existing.board)} ${nft} is already registered in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}. It can't also be added to ${BOARD_LABELS[activeBoard]}.`)
+            return
+          }
+          // Found on the same board, different level — offer to continue as a
+          // level upgrade.
           isUpgrade = true
           upgradeFromLevel = existing.level
           upgradeNoticeText.textContent = `${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}. Do you want to upgrade to ${BOARD_LABELS[activeBoard]} Level ${activeLevel} and continue?`
@@ -1225,8 +1535,8 @@
       // last-moment re-check in case someone else grabbed this NFT number while this
       // person was filling out the rest of the form
       const existing = await findExistingNft(nft)
-      if (existing) {
-        const isExpectedUpgradeTarget = isUpgrade && existing.level === upgradeFromLevel
+      if (existing && !isPairedBoard(existing.board, activeBoard)) {
+        const isExpectedUpgradeTarget = isUpgrade && existing.board === activeBoard && existing.level === upgradeFromLevel
         if (!isExpectedUpgradeTarget) {
           showStep(4)
           showError(`${identifierName(existing.board)} ${nft} is already there in ${BOARD_LABELS[existing.board] || existing.board} Level ${existing.level}.`)
@@ -1294,6 +1604,169 @@
   window.addEventListener('resize', () => {
     levelListEl.querySelectorAll('.photo-carousel').forEach((carousel) => setupCarousel(carousel))
   })
+
+  // ---- ID Card modal: photo + name/district/date/level, download/share/copy link ----
+  const idCardOverlay = document.getElementById('idCardOverlay')
+  const idCardEl = document.getElementById('idCardEl')
+  const idCardPhoto = document.getElementById('idCardPhoto')
+  const idCardName = document.getElementById('idCardName')
+  const idCardDistrict = document.getElementById('idCardDistrict')
+  const idCardDate = document.getElementById('idCardDate')
+  const idCardLevel = document.getElementById('idCardLevel')
+  const idCardCloseBtn = document.getElementById('idCardCloseBtn')
+  const idCardDownloadBtn = document.getElementById('idCardDownloadBtn')
+  const idCardShareBtn = document.getElementById('idCardShareBtn')
+  const idCardCopyLinkBtn = document.getElementById('idCardCopyLinkBtn')
+  const idCardStatus = document.getElementById('idCardStatus')
+
+  let activeIdCardMember = null
+
+  function idCardLevelLabel(board, level) {
+    const boardName = isTsBoard(board) ? 'T&S' : 'V-Boost'
+    const line2 = isDirectBoard(board) ? `${level} Direct` : `Level ${level}`
+    return `<span class="idcard-level-board">${boardName}</span><span class="idcard-level-value">${line2}</span>`
+  }
+
+  // Builds a link back to this page that identifies exactly this member's card,
+  // so opening the link auto-shows the same photo/ID card.
+  function memberLinkUrl(member) {
+    const url = new URL(window.location.href)
+    url.search = ''
+    url.hash = ''
+    url.searchParams.set('board', member.board)
+    url.searchParams.set('member', member.id)
+    return url.toString()
+  }
+
+  function openIdCard(member) {
+    activeIdCardMember = member
+    idCardPhoto.src = member.photo_url
+    idCardPhoto.alt = member.name
+    idCardName.textContent = member.name
+    idCardDistrict.textContent = member.district || ''
+    idCardDistrict.style.display = member.district ? '' : 'none'
+    idCardDate.textContent = formatDisplayDate(memberDisplayDate(member))
+    idCardLevel.innerHTML = idCardLevelLabel(member.board, member.level)
+    idCardStatus.textContent = ''
+    idCardOverlay.classList.add('open')
+
+    // reflect this card in the URL so Copy Link/Share work immediately
+    window.history.replaceState(null, '', memberLinkUrl(member))
+  }
+
+  function closeIdCard() {
+    idCardOverlay.classList.remove('open')
+    activeIdCardMember = null
+    const url = new URL(window.location.href)
+    url.searchParams.delete('board')
+    url.searchParams.delete('member')
+    window.history.replaceState(null, '', url.pathname + url.hash)
+  }
+
+  idCardCloseBtn.addEventListener('click', closeIdCard)
+  idCardOverlay.addEventListener('click', (e) => { if (e.target === idCardOverlay) closeIdCard() })
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && idCardOverlay.classList.contains('open')) closeIdCard()
+  })
+
+  function waitForPhotoReady() {
+    // Guards against html2canvas snapshotting the card before the photo has
+    // actually finished loading (which can also trigger a render failure).
+    if (idCardPhoto.complete && idCardPhoto.naturalWidth > 0) return Promise.resolve()
+    return new Promise((resolve) => {
+      const done = () => { idCardPhoto.removeEventListener('load', done); idCardPhoto.removeEventListener('error', done); resolve() }
+      idCardPhoto.addEventListener('load', done)
+      idCardPhoto.addEventListener('error', done)
+      setTimeout(done, 4000) // don't hang forever if the photo never loads
+    })
+  }
+
+  async function renderIdCardToCanvas() {
+    if (!window.html2canvas) throw new Error('html2canvas failed to load')
+    await waitForPhotoReady()
+    idCardEl.classList.add('capturing')
+    try {
+      return await window.html2canvas(idCardEl, { backgroundColor: null, useCORS: true, imageTimeout: 8000, scale: 3 })
+    } finally {
+      idCardEl.classList.remove('capturing')
+    }
+  }
+
+  idCardDownloadBtn.addEventListener('click', async () => {
+    idCardStatus.textContent = 'Preparing image…'
+    try {
+      const canvas = await renderIdCardToCanvas()
+      const link = document.createElement('a')
+      const safeName = (activeIdCardMember?.name || 'vistory-card').trim().replace(/\s+/g, '-')
+      link.download = `${safeName}-vistory.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+      idCardStatus.textContent = 'Downloaded ✓'
+    } catch (err) {
+      console.error(err)
+      idCardStatus.textContent = `Could not create the image — try again.${err && err.message ? ` (${err.message})` : ''}`
+    }
+  })
+
+  idCardShareBtn.addEventListener('click', async () => {
+    if (!activeIdCardMember) return
+    const link = memberLinkUrl(activeIdCardMember)
+    idCardStatus.textContent = 'Preparing…'
+    try {
+      const canvas = await renderIdCardToCanvas()
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+      const file = blob ? new File([blob], 'vistory-card.png', { type: 'image/png' }) : null
+
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Native share sheet (WhatsApp, etc.) with the actual image attached
+        await navigator.share({ files: [file], title: 'Vistory', text: `${activeIdCardMember.name} — Royal Spark Winners Team\n${link}` })
+        idCardStatus.textContent = ''
+        return
+      }
+      if (navigator.share) {
+        // Some browsers support share() but not file sharing — share the link instead
+        await navigator.share({ title: 'Vistory', text: `${activeIdCardMember.name} — Royal Spark Winners Team`, url: link })
+        idCardStatus.textContent = ''
+        return
+      }
+      // Desktop fallback: open WhatsApp Web with the link pre-filled
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${activeIdCardMember.name} — Royal Spark Winners Team\n${link}`)}`, '_blank')
+      idCardStatus.textContent = ''
+    } catch (err) {
+      if (err && err.name === 'AbortError') { idCardStatus.textContent = ''; return }
+      console.error(err)
+      try {
+        await navigator.clipboard.writeText(link)
+        idCardStatus.textContent = "Couldn't open share — link copied instead."
+      } catch {
+        idCardStatus.textContent = 'Could not share.'
+      }
+    }
+  })
+
+  idCardCopyLinkBtn.addEventListener('click', async () => {
+    if (!activeIdCardMember) return
+    const link = memberLinkUrl(activeIdCardMember)
+    try {
+      await navigator.clipboard.writeText(link)
+      idCardStatus.textContent = 'Link copied ✓'
+    } catch (err) {
+      console.error(err)
+      idCardStatus.textContent = link
+    }
+    setTimeout(() => { if (idCardStatus.textContent === 'Link copied ✓') idCardStatus.textContent = '' }, 2500)
+  })
+
+  // If this page was opened via a shared card link (?board=..&member=..), open
+  // that member's ID card automatically once members have loaded.
+  function maybeOpenSharedCardFromUrl() {
+    if (idCardOverlay.classList.contains('open')) return
+    const params = new URLSearchParams(window.location.search)
+    const memberId = params.get('member')
+    if (!memberId) return
+    const member = allMembers.find((m) => String(m.id) === memberId)
+    if (member) openIdCard(member)
+  }
 </script>
 </body>
 </html>
